@@ -100,6 +100,7 @@
 #include <random>
 #include <algorithm>
 #include <iomanip>
+#include <locale>
 
 using namespace std;
 
@@ -108,44 +109,70 @@ struct Agent {
     float money;
     float productivity;
     float reputation;
+
+    float fraud_tendency;   // Crime chance 
+    bool is_fraudulent;
 };
 
 void updateReputation(Agent& a, float produced) {
     const float expected = 1.0;
     const float alpha = 0.05;
-    const float decay = 0.995;
+    const float decay = 0.99;
 
     float delta = (produced - expected) / expected;
     a.reputation += alpha * delta;
     a.reputation *= decay;
 
     a.reputation = (a.reputation, 0.0, 1.0);
+
 }
 
 int main() {
-    const int NUM_AGENTS = 100;
-    const int TURNS = 200;
+    const uint64_t NUM_AGENTS = 100;
+    const uint64_t TURNS = 200;
     float price = 1.00;
 
     mt19937 rng(42);
-    uniform_real_distribution<float> prod_dist(0.5, 1.5);
+    uniform_real_distribution<float> dist(0.5, 1.5);
     vector<Agent> agents;
 
-    for (int i = 0; i < NUM_AGENTS; i++) {
-        agents.push_back({ 10.0, prod_dist(rng) });
+    uniform_real_distribution<float> fraud_dist(0.0f, 1.0f);
+
+    for (uint64_t i = 0; i < NUM_AGENTS; i++) {                 //initialisation
+        float tendency = fraud_dist(rng);
+
+        agents.push_back({
+            10.0f,
+            dist(rng),
+            0.5f,
+            tendency,
+            false
+            });
     }
 
-    for (int turn = 0; turn < TURNS; turn++) {
+    for (uint64_t turn = 0; turn < TURNS; turn++) {
         float total_supply = 0.0;
         float total_demand = NUM_AGENTS * 1.0;
         float total_rep = 0.0;
 
-        for (auto& a : agents) {
-            float produced = a.productivity;
-            total_supply += produced;
-            total_rep += a.reputation;
+        for (auto& j : agents) {
+            j.is_fraudulent = false;
 
-            a.money += produced * price;
+            if (fraud_dist(rng) < j.fraud_tendency) {
+                j.is_fraudulent = true;
+                total_rep += j.reputation * 1.5f;  // fake boost might remove to make it more realistic (when not included total money increases)
+            }
+            else {
+                total_rep += j.reputation;
+            }
+        }
+
+        for (auto& j : agents) {
+            float produced = j.productivity;
+            total_supply += produced;
+            total_rep += j.reputation;
+
+            j.money += produced * price;
         }
 
         if (total_demand > total_supply)
@@ -153,38 +180,49 @@ int main() {
         else
             price *= 0.95;
 
-        for (auto& a : agents) {
-            float produced = a.productivity;
+        for (auto& j : agents) {
+            float produced = j.productivity;
+
+            float effective_rep = j.is_fraudulent
+                ? j.reputation * 1.5f
+                : j.reputation;
 
             float share = (total_rep > 0)
-                ? (a.reputation / total_rep)
-                : (1.0 / NUM_AGENTS);
+                ? effective_rep / total_rep
+                : 1.0f / NUM_AGENTS;
 
             float market_buy = share * total_demand;
             float sold = min(produced, market_buy);
 
-            a.money += sold * price;
+            j.money += sold * price;
 
-            updateReputation(a, produced);
+            updateReputation(j, produced);
+
+            const float audit_rate = 0.05f; // strength of regulation
+
+            if (j.is_fraudulent && fraud_dist(rng) < audit_rate) { // is caught
+                j.reputation *= 0.2f; //reputation hit
+                j.money *= 0.9f; // fine incurred
+            }
         }
 
-        for (auto& a : agents) {
-            float desired = 1.0;
-            float affordable = a.money / price;
+        for (auto& j : agents) {
+            float desired = 1.0;            //desired to affordability check.
+            float affordable = j.money / price;
             float bought = min(desired, affordable);
-            a.money -= bought * price;
+            j.money -= bought * price;
         }
 
         float total_money = 0;
-        for (auto& a : agents)
-            total_money += a.money;
+        for (auto& j : agents)
+            total_money += j.money;
 
         if (turn % 20 == 0) {
             //cout << setprecision(2) << price; - was trying to round to 2 decimal places and wasnt working will resolve later
             // weird issue where the debug console didnt like £ idk what the issue is will also resolve this later
             cout << "Turn " << turn
-                << " | Price: " << price
-                << " | Avg Money: " << total_money / NUM_AGENTS
+                << " | Price: GBP " << price
+                << " | Avg Money: GBP " << total_money / NUM_AGENTS
                 << endl;
         }
     }
