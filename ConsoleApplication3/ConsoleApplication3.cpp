@@ -101,6 +101,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <locale>
+#include <fstream>
 
 using namespace std;
 
@@ -112,6 +113,8 @@ struct Agent {
 
     float fraud_tendency;   // Crime chance 
     bool is_fraudulent;
+
+    float last_money;       // learning memory
 };
 
 void updateReputation(Agent& a, float produced) {
@@ -123,8 +126,34 @@ void updateReputation(Agent& a, float produced) {
     a.reputation += alpha * delta;
     a.reputation *= decay;
 
-    a.reputation = (a.reputation, 0.0, 1.0);
+    a.reputation = (a.reputation, 0.0f, 1.0f);
 
+}
+
+void learn(Agent& a) {
+    const float learning_rate = 0.02f;
+    const float regret_rate = 0.05f;
+
+    float payoff = a.money - a.last_money;
+
+    if (a.is_fraudulent) {
+        if (payoff > 0) {
+            a.fraud_tendency += learning_rate * payoff;
+        }
+        else {
+            a.fraud_tendency -= regret_rate * (-payoff);
+        }
+    }
+    else {
+        if (payoff < 0) {
+            a.fraud_tendency += learning_rate * (-payoff);
+        }
+        else {
+            a.fraud_tendency *= 0.999f; // slow decay toward honesty
+        }
+    }
+
+    a.fraud_tendency = (a.fraud_tendency, 0.0f, 1.0f);
 }
 
 int main() {
@@ -132,11 +161,15 @@ int main() {
     const uint64_t TURNS = 200;
     float price = 1.00;
 
+    ofstream rep_file("reputation_over_time.csv");
+    rep_file << "Turn,AvgReputation,FraudsterReputation,HonestReputation,FraudsterCount\n";
+
     mt19937 rng(42);
     uniform_real_distribution<float> dist(0.5, 1.5);
     vector<Agent> agents;
 
     uniform_real_distribution<float> fraud_dist(0.0f, 1.0f);
+
 
     for (uint64_t i = 0; i < NUM_AGENTS; i++) {                 //initialisation
         float tendency = fraud_dist(rng);
@@ -150,24 +183,28 @@ int main() {
             });
     }
 
+    for (auto& j : agents) {
+        j.last_money = j.money;
+    }
+
     for (uint64_t turn = 0; turn < TURNS; turn++) {
         float total_supply = 0.0;
         float total_demand = NUM_AGENTS * 1.0;
         float total_rep = 0.0;
 
-        for (auto& j : agents) {
+        for (auto& j : agents) {   //decides fraud
             j.is_fraudulent = false;
 
             if (fraud_dist(rng) < j.fraud_tendency) {
                 j.is_fraudulent = true;
-                total_rep += j.reputation * 1.5f;  // fake boost might remove to make it more realistic (when not included total money increases)
+                total_rep += j.reputation ;  // Short term gain for realism
             }
             else {
                 total_rep += j.reputation;
             }
         }
 
-        for (auto& j : agents) {
+        for (auto& j : agents) {  //production
             float produced = j.productivity;
             total_supply += produced;
             total_rep += j.reputation;
@@ -175,10 +212,11 @@ int main() {
             j.money += produced * price;
         }
 
-        if (total_demand > total_supply)
+        if (total_demand > total_supply)  //supply and demand price changes
             price *= 1.05;
         else
             price *= 0.95;
+
 
         for (auto& j : agents) {
             float produced = j.productivity;
@@ -204,6 +242,52 @@ int main() {
                 j.reputation *= 0.2f; //reputation hit
                 j.money *= 0.9f; // fine incurred
             }
+
+            for (auto& a : agents) {
+                learn(a);
+            }
+
+            float total_rep = 0.0f;
+            float fraud_rep = 0.0f;
+            float honest_rep = 0.0f;
+
+            float avg_fraud_tendency = 0.0f;
+
+            int fraud_count = 0;
+            int honest_count = 0;
+
+            for (auto& a : agents) {
+                total_rep += a.reputation;
+                avg_fraud_tendency += a.fraud_tendency;
+
+                if (a.is_fraudulent) {
+                    fraud_rep += a.reputation;
+                    fraud_count++;
+                }
+                else {
+                    honest_rep += a.reputation;
+                    honest_count++;
+                }
+            }
+
+            float avg_rep = total_rep / NUM_AGENTS;
+            avg_fraud_tendency /= NUM_AGENTS;
+            float avg_fraud_rep = fraud_count > 0 ? fraud_rep / fraud_count : 0.0f;
+            float avg_honest_rep = honest_count > 0 ? honest_rep / honest_count : 0.0f;
+
+            /*float avg_fraud_tendency = 0.0f;
+            for (auto& a : agents)
+                avg_fraud_tendency += a.fraud_tendency;
+
+            avg_fraud_tendency /= NUM_AGENTS;*/
+
+            rep_file << turn << ","
+                << avg_rep << ","
+                << avg_fraud_rep << ","
+                << avg_honest_rep << ","
+                << fraud_count << ","
+                << avg_fraud_tendency << "\n";
+
         }
 
         for (auto& j : agents) {
@@ -220,11 +304,26 @@ int main() {
         if (turn % 20 == 0) {
             //cout << setprecision(2) << price; - was trying to round to 2 decimal places and wasnt working will resolve later
             // weird issue where the debug console didnt like £ idk what the issue is will also resolve this later
+            cout << fixed << setprecision(2);
             cout << "Turn " << turn
                 << " | Price: GBP " << price
                 << " | Avg Money: GBP " << total_money / NUM_AGENTS
                 << endl;
+
+            for (uint64_t i = 0; i < NUM_AGENTS; i++)
+            {
+                if (agents[i].reputation < 1)
+                {
+                    cout << "Agent Number : " << i
+                        << " | Reputation :" << agents[i].reputation
+                        << endl;
+                }
+            }
         }
+
+        rep_file.close();
+
+        
     }
 }
 

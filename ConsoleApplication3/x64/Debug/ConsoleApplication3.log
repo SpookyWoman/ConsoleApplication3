@@ -1,7 +1,6 @@
 ﻿  ConsoleApplication3.cpp
-C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(119,25): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(120,25): warning C4305: 'initializing': truncation from 'double' to 'float'
-C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(126,38): warning C4244: '=': conversion from 'double' to 'float', possible loss of data
-C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(179,26): warning C4305: '*=': truncation from 'double' to 'float'
-C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(181,26): warning C4305: '*=': truncation from 'double' to 'float'
+C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(122,25): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(123,25): warning C4305: 'initializing': truncation from 'double' to 'float'
+C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(216,26): warning C4305: '*=': truncation from 'double' to 'float'
+C:\Users\User\source\repos\ConsoleApplication3\ConsoleApplication3\ConsoleApplication3.cpp(218,26): warning C4305: '*=': truncation from 'double' to 'float'
   ConsoleApplication3.vcxproj -> C:\Users\User\source\repos\ConsoleApplication3\x64\Debug\ConsoleApplication3.exe
