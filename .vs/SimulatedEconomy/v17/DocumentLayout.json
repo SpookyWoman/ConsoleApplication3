@@ -5,6 +5,9 @@
     {
       "AbsoluteMoniker": "D:0:0:{68BC3072-FEE1-4AAE-9F09-4F86675E3C69}|ConsoleApplication3\\ConsoleApplication3.vcxproj|C:\\Users\\User\\source\\repos\\ConsoleApplication3\\ConsoleApplication3\\ConsoleApplication3.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
       "RelativeMoniker": "D:0:0:{68BC3072-FEE1-4AAE-9F09-4F86675E3C69}|ConsoleApplication3\\ConsoleApplication3.vcxproj|solutionrelative:ConsoleApplication3\\ConsoleApplication3.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{68BC3072-FEE1-4AAE-9F09-4F86675E3C69}|ConsoleApplication3\\ConsoleApplication3.vcxproj|C:\\PROGRAM FILES\\MICROSOFT VISUAL STUDIO\\2022\\COMMUNITY\\VC\\TOOLS\\MSVC\\14.39.33519\\INCLUDE\\RANDOM||{3B902123-F8A7-4915-9F01-361F908088D0}"
     }
   ],
   "DocumentGroupContainers": [
@@ -14,8 +17,21 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 0,
+          "SelectedChildIndex": 1,
           "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "random",
+              "DocumentMoniker": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\random",
+              "RelativeDocumentMoniker": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\random",
+              "ToolTip": "C:\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\random",
+              "RelativeToolTip": "..\\..\\..\\..\\..\\Program Files\\Microsoft Visual Studio\\2022\\Community\\VC\\Tools\\MSVC\\14.39.33519\\include\\random",
+              "ViewState": "AQIAACUBAAAAAAAAAAASwDkBAAA1AAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.001001|",
+              "WhenOpened": "2026-02-12T12:22:21.4Z",
+              "EditorCaption": ""
+            },
             {
               "$type": "Document",
               "DocumentIndex": 0,
@@ -24,7 +40,7 @@
               "RelativeDocumentMoniker": "ConsoleApplication3\\ConsoleApplication3.cpp",
               "ToolTip": "C:\\Users\\User\\source\\repos\\ConsoleApplication3\\ConsoleApplication3\\ConsoleApplication3.cpp",
               "RelativeToolTip": "ConsoleApplication3\\ConsoleApplication3.cpp",
-              "ViewState": "AQIAAJ4AAAAAAAAAAAAAAAsBAAAvAAAA",
+              "ViewState": "AQIAADQBAAAAAAAAAAAAAEYBAAAJAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
               "WhenOpened": "2026-01-24T02:06:07.598Z",
               "EditorCaption": ""

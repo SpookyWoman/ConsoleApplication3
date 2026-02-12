@@ -117,6 +117,12 @@ struct Agent {
     float last_money;       // learning memory
 };
 
+float clampf(float value, float low, float high) {
+    if (value < low) return low;
+    if (value > high) return high;
+    return value;
+}
+
 void updateReputation(Agent& a, float produced) {
     const float expected = 1.0;
     const float alpha = 0.05;
@@ -125,8 +131,7 @@ void updateReputation(Agent& a, float produced) {
     float delta = (produced - expected) / expected;
     a.reputation += alpha * delta;
     a.reputation *= decay;
-
-    a.reputation = (a.reputation, 0.0f, 1.0f);
+    a.reputation = clampf(a.reputation, 0.0f, 1.0f);
 
 }
 
@@ -153,7 +158,7 @@ void learn(Agent& a) {
         }
     }
 
-    a.fraud_tendency = (a.fraud_tendency, 0.0f, 1.0f);
+    a.fraud_tendency = clampf(a.fraud_tendency, 0.0f, 1.0f);
 }
 
 int main() {
@@ -320,10 +325,8 @@ int main() {
                 }
             }
         }
-
-        rep_file.close();
-
         
     }
+    rep_file.close();
 }
 
